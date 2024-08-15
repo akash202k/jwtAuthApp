@@ -21,32 +21,31 @@ router.post("/signin", async (req, res) => {
         // check user exist in db
         const user = await User.findOne({ username });
         if (!user) {
-            res.json({
+            res.status(403).json({
                 error: "user does not exist. try signup instead !"
             })
             return;
         }
 
-        // compare password
-        await bcrypt.compare(password, user.password, async (err, result) => {
-            if (err) {
-                console.log("Invalid Password !");
-                return res.json({
-                    error: "Invalid Password !"
-                })
-            }
-            const jwtToken = await jwt.sign({ username, id: user._id }, process.env.JWT_SECRET);
-            const token = `Bearer ${jwtToken}`;
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: false,
-                maxAge: 60 * 60 * 1000
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(403).json({
+                error: "Invalid Password!"
             });
-            console.log("Login Success");
-            return res.json({
-                message: "Login Success"
-            })
+        }
+
+        const jwtToken = await jwt.sign({ username, id: user._id }, process.env.JWT_SECRET);
+        const token = `Bearer ${jwtToken}`;
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            maxAge: 60 * 60 * 1000
+        });
+        console.log("Login Success");
+        return res.json({
+            message: "Login Success"
         })
+
     } catch (error) {
         console.log("Error : ", error);
         return res.status(500).json({
@@ -89,6 +88,7 @@ router.post("/signup", async (req, res) => {
 
 router.get("/signout", (req, res) => {
     res.clearCookie("token");
+    console.log("Signout success");
     res.json({
         message: "Signout success",
     });

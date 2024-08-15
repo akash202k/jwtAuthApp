@@ -1,12 +1,16 @@
 import jwt from "jsonwebtoken";
+import { set } from "mongoose";
 
 
 const auth = (req, res, next) => {
     try {
+        setTimeout(() => {
+
+        }, 5000);
         console.log("Auth Middleware");
         // check if token is present in cookies
         const token = req.cookies?.token;
-        if (!token) {
+        if (req.cookies = ! null && !token) {
             console.log("No token found");
             return res.status(401).json({
                 message: "Unauthorized",
