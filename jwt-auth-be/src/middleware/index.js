@@ -4,9 +4,9 @@ import { set } from "mongoose";
 
 const auth = (req, res, next) => {
     try {
-        setTimeout(() => {
+        // setTimeout(() => {
 
-        }, 5000);
+        // }, 5000);
         console.log("Auth Middleware");
         // check if token is present in cookies
         const token = req.cookies?.token;
